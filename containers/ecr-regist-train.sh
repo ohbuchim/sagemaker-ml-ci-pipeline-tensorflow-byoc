@@ -6,6 +6,9 @@ ECR_REPOGITORY='sagemaker-tf-nightly-gpu'
 IMAGE_TAG=':latest'
 IMAGE_URI="${REGISTRY_URL}/${ECR_REPOGITORY}"
 
+echo "----------------"
+echo $DATA_PATH
+
 aws ecr get-login-password | docker login --username AWS --password-stdin $REGISTRY_URL
 aws ecr create-repository --repository-name $ECR_REPOGITORY
 
