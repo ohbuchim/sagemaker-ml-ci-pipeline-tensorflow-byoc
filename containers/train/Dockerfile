@@ -1,4 +1,4 @@
-FROM tensorflow/tensorflow:nightly-gpu
+FROM tensorflow/tensorflow:2.2.1-gpu
 
 # かつては RUN pip install sagemaker-containers を行っていた
 # install the SageMaker Training Toolkit 
