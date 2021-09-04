@@ -46,6 +46,7 @@ if __name__ == '__main__':
     parser.add_argument('--epoch', type=str, default=os.environ['EPOCH'])
     args = parser.parse_args()
 
+    print('=====================', args.data_path)
     
     # SFn の実行に必要な情報を渡す際のスキーマを定義します
     schema = {'TrainJobName': str}
