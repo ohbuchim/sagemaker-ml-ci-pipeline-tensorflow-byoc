@@ -24,7 +24,7 @@ SAGEMAKER_ROLE = 'arn:aws:iam::420964472730:role/service-role/AmazonSageMaker-Ex
 WORKFLOW_ROLE='arn:aws:iam::420964472730:role/StepFunctionsWorkflowExecutionRole'
 
 def create_estimator():
-    hyperparameters = {'batch_size': args.batch_size,'epochs': args.epoch}
+    hyperparameters = {'batch-size': args.batch_size,'epochs': args.epoch}
     output_path = 's3://{}/output'.format(BUCKET)
     estimator = Estimator(
                         image_uri=args.train_url,
