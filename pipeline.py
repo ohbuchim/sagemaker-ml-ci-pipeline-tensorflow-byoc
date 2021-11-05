@@ -19,13 +19,27 @@ stepfunctions.set_stream_logger(level=logging.INFO)
 id = uuid.uuid4().hex
 config_name = 'flow.yaml'
 
-with open(config_name) as file:
-    config = yaml.safe_load(file)
-    test_param = config['train']['train-job-name']
-    print('------------------')
-    print(test_param)
+
+def get_parameters():
+    params = {}
+    with open(config_name) as file:
+        config = yaml.safe_load(file)
+        params['prep-input-path'] = config['preprocess']['input-data-path']
+        params['prep-output-path'] = config['preprocess']['processed-data-path']
+        params['train-job-name'] = config['train']['train-job-name']
+        params['train-image-uri'] = config['train']['train-image-uri']
+        params['hyperparameters'] = {}
+        params['hyperparameters']['batch-size'] = config['train']['hyperparameters']['batch-size']
+        params['hyperparameters']['epoch'] = config['train']['hyperparameters']['epoch']
+        params['eval-model-path'] = config['evaluate']['model-path']
+        params['eval-data-path'] = config['evaluate']['data-path']
+        params['eval-result-path'] = config['evaluate']['result-path']
+        print('------------------')
+        print(params)
+    return params
 
 
+get_parameters()
 # REGION='us-east-1'
 # BUCKET='sagemaker-us-east-1-420964472730'
 # FLOW_NAME='flow_{}'.format(id) 
