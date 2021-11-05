@@ -25,9 +25,9 @@ def get_parameters():
     with open(config_name) as file:
         config = yaml.safe_load(file)
         params['prep-input-path'] = config['preprocess']['input-data-path']
-        params['prep-output-path'] = config['preprocess']['processed-data-path']
-        params['train-job-name'] = config['train']['train-job-name']
-        params['train-image-uri'] = config['train']['train-image-uri']
+        params['prep-output-path'] = config['preprocess']['output-data-path']
+        params['train-job-name'] = config['train']['job-name']
+        params['train-image-uri'] = config['train']['image-uri']
         params['hyperparameters'] = {}
         params['hyperparameters']['batch-size'] = config['train']['hyperparameters']['batch-size']
         params['hyperparameters']['epoch'] = config['train']['hyperparameters']['epoch']
@@ -39,7 +39,7 @@ def get_parameters():
     return params
 
 
-get_parameters()
+params = get_parameters()
 # REGION='us-east-1'
 # BUCKET='sagemaker-us-east-1-420964472730'
 # FLOW_NAME='flow_{}'.format(id) 

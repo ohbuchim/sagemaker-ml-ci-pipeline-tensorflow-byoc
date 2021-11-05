@@ -1,9 +1,12 @@
+config:
+  region: 'us-east-1'
 preprocess:
   input-data-path: 's3://sagemaker-sample-data-us-east-1/tensorflow/mnist/'
-  processed-data-path: 's3://sagemaker-sample-data-us-east-1/tensorflow/mnist/'
+  output-data-path: 's3://sagemaker-sample-data-us-east-1/tensorflow/mnist/'
+  image-uri:
 train:
-  train-job-name: 'mlops-demo'
-  train-image-uri: '8815969174475.dkr.ecr.us-east-1.amazonaws.com/sagemaker-tf-nightly-gpu'
+  job-name: 'mlops-demo'
+  image-uri: '8815969174475.dkr.ecr.us-east-1.amazonaws.com/sagemaker-tf-nightly-gpu'
   hyperparameters:
     batch-size: 8
     epoch: 1
