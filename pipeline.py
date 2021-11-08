@@ -26,7 +26,7 @@ def get_parameters():
         config = yaml.safe_load(file)
         params['prep-input-path'] = config['preprocess']['input-data-path']
         params['prep-output-path'] = config['preprocess']['output-data-path']
-        params['train-job-name'] = config['train']['job-name']
+        params['job-name-prefix'] = config['config']['job-name']
         params['train-image-uri'] = config['train']['image-uri']
         params['hyperparameters'] = {}
         params['hyperparameters']['batch-size'] = config['train']['hyperparameters']['batch-size']
