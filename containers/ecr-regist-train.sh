@@ -6,6 +6,7 @@ REGISTRY_URL="${ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com"
 # ECR_REPOGITORY='sagemaker-tf-nightly-gpu'
 IMAGE_TAG=$(git rev-parse --short HEAD)
 
+echo ${ACCOUNT_ID}
 echo "========"
 echo ${IMAGE_TAG}
 
