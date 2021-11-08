@@ -18,6 +18,6 @@ phases:
       # Set Environment Variables from flow.yaml
       - . ./setenv.sh
       # Build Docker images and push to ECR
-      - . ./containers/ecr-regist-train.sh
+      - . ./containers/ecr-regist-images.sh
       # Execute ML workflow
       - python $SRC
