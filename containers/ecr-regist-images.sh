@@ -17,9 +17,9 @@ aws ecr get-login-password | docker login --username AWS --password-stdin $REGIS
 aws ecr create-repository --repository-name $ECR_REPOGITORY
 
 docker build -t $ECR_REPOGITORY containers/train/
-docker tag "${ECR_REPOGITORY}:latest" "${ECR_REPOGITORY}:${IMAGE_TAG}"
-docker push "${ECR_REPOGITORY}:${IMAGE_TAG}"
-docker push "${IMAGE_URI}:latest"
+docker tag "${ECR_REPOGITORY}:latest" ${IMAGE_URI}
+docker tag "${ECR_REPOGITORY}:${IMAGE_TAG}" ${IMAGE_URI}
+docker push ${IMAGE_URI}
 
 echo "Container registered. URI:${IMAGE_URI}"
 
