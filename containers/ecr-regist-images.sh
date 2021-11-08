@@ -4,7 +4,8 @@
 REGION=${AWS_DEFAULT_REGION}
 REGISTRY_URL="${ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com" 
 # ECR_REPOGITORY='sagemaker-tf-nightly-gpu'
-IMAGE_TAG="$(git rev-parse --short HEAD)"
+IMAGE_TAG="$(git rev-parse HEAD)"
+# IMAGE_TAG="$(git rev-parse --short HEAD)"
 
 echo "========"
 echo ${IMAGE_TAG}
@@ -19,6 +20,8 @@ aws ecr create-repository --repository-name $ECR_REPOGITORY
 docker build -t $ECR_REPOGITORY containers/train/
 docker tag ${ECR_REPOGITORY} $IMAGE_URI:${IMAGE_TAG}
 docker push $IMAGE_URI:${IMAGE_TAG}
+docker tag ${ECR_REPOGITORY} "$IMAGE_URI:latest"
+docker push "$IMAGE_URI:latest"
 
 echo "Container registered. URI:${IMAGE_URI}"
 
