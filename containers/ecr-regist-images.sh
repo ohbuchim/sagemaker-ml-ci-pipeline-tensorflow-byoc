@@ -17,7 +17,7 @@ aws ecr get-login-password | docker login --username AWS --password-stdin $REGIS
 aws ecr create-repository --repository-name $ECR_REPOGITORY
 
 docker build -t $ECR_REPOGITORY containers/train/
-docker tag ${ECR_REPOGITORY} ${ECR_REPOGITORY}:${IMAGE_TAG}
+docker tag ${ECR_REPOGITORY}:latest ${ECR_REPOGITORY}:${IMAGE_TAG}
 docker push ${ECR_REPOGITORY}:${IMAGE_TAG}
 docker push ${IMAGE_URI}:latest
 
@@ -31,7 +31,7 @@ aws ecr get-login-password | docker login --username AWS --password-stdin $REGIS
 aws ecr create-repository --repository-name $ECR_REPOGITORY
 
 docker build -t $ECR_REPOGITORY containers/evaluate/
-docker tag ${ECR_REPOGITORY} ${ECR_REPOGITORY}:${IMAGE_TAG}
+docker tag ${ECR_REPOGITORY}:latest ${ECR_REPOGITORY}:${IMAGE_TAG}
 docker push ${ECR_REPOGITORY}:${IMAGE_TAG}
 docker push ${IMAGE_URI}:latest
 
