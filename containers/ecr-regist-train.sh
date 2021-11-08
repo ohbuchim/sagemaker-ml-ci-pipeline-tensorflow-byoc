@@ -10,7 +10,8 @@ echo "========"
 echo ${IMAGE_TAG}
 
 # train
-IMAGE_URI="${REGISTRY_URL}/${ECR_REPOGITORY}-train"
+ECR_REPOGITORY=${ECR_REPOGITORY_PREFIX}-train
+IMAGE_URI="${REGISTRY_URL}/${ECR_REPOGITORY}"
 
 aws ecr get-login-password | docker login --username AWS --password-stdin $REGISTRY_URL
 aws ecr create-repository --repository-name $ECR_REPOGITORY
@@ -22,7 +23,8 @@ docker push $IMAGE_URI
 echo "Container registered. URI:${IMAGE_URI}"
 
 # evaluate
-IMAGE_URI="${REGISTRY_URL}/${ECR_REPOGITORY}-evaluate"
+ECR_REPOGITORY=${ECR_REPOGITORY_PREFIX}-evaluate
+IMAGE_URI="${REGISTRY_URL}/${ECR_REPOGITORY}"
 
 aws ecr get-login-password | docker login --username AWS --password-stdin $REGISTRY_URL
 aws ecr create-repository --repository-name $ECR_REPOGITORY
