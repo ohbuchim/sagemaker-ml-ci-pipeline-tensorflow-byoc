@@ -12,6 +12,6 @@ train:
     batch-size: 8
     epoch: 1
 evaluate:
-  model-path: 
+  model-path: ''
   data-path:
   result-path:
