@@ -13,8 +13,8 @@ echo ${IMAGE_TAG}
 ECR_REPOGITORY="${ECR_REPOGITORY_PREFIX}-train"
 IMAGE_URI="${REGISTRY_URL}/${ECR_REPOGITORY}"
 
-echo "repo name=-=-===--="
-echo ${ECR_REPOGITORY}
+echo "repo name prefix=-=-===--="
+echo ${ECR_REPOGITORY_PREFIX}
 
 aws ecr get-login-password | docker login --username AWS --password-stdin $REGISTRY_URL
 aws ecr create-repository --repository-name $ECR_REPOGITORY
