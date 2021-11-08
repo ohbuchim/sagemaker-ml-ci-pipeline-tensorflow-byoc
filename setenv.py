@@ -12,3 +12,4 @@ with open('flow.yaml') as file:
     while(idx<num):
         val = val[args[idx]]
         idx+=1
+    return val
