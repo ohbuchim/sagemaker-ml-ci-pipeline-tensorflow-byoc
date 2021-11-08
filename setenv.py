@@ -8,6 +8,7 @@ with open('flow.yaml') as file:
     obj = yaml.safe_load(file)
     val = obj
     idx = 1
+    print(val)
     while(idx<num):
         val = val[args[idx]]
         idx+=1
