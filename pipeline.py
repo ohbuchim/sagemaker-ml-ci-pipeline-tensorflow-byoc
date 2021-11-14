@@ -198,11 +198,11 @@ def create_evaluation_step(params, model_evaluation_processor,
     return evaluation_step
 
 
-def create_sfn_workflow(params, steps):
+def create_sfn_workflow(params, processing_step, training_step, evaluation_step):
     sfn_workflow_name = params['sfn-workflow-name']
     workflow_execution_role = params['sfn-role-arn']
 
-    workflow_graph = Chain(steps)
+    workflow_graph = Chain([processing_step, training_step, evaluation_step])
 
     branching_workflow = Workflow(
         name=sfn_workflow_name,
@@ -257,7 +257,7 @@ if __name__ == '__main__':
         execution_input, eval_job_name, estimator)
 
     branching_workflow = create_sfn_workflow(
-        params, [processing_step, training_step, evaluation_step])
+        params, processing_step, training_step, evaluation_step)
     
     # Execute workflow
     execution = branching_workflow.execute(
