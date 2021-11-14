@@ -156,6 +156,7 @@ def create_evaluation_step(params, model_evaluation_processor,
                            execution_input, job_name, estimator):
     evaluation_output_destination = os.path.join(
         params['eval-result-path'], job_name)
+    prepro_input_data = params['prep-input-path']
     model_dir = '/opt/ml/processing/model'
     data_dir = '/opt/ml/processing/test'
     output_dir = '/opt/ml/processing/evaluation'
