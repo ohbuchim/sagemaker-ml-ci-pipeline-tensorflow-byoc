@@ -24,6 +24,7 @@ def get_parameters():
     params = {}
     with open(config_name) as file:
         config = yaml.safe_load(file)
+        params['sfn-role-arn'] = config['config']['sfn-role-arn']
         params['job-name-prefix'] = config['config']['job-name-prefix']
         params['prep-input-path'] = config['preprocess']['input-data-path']
         params['prep-output-path'] = config['preprocess']['output-data-path']        
