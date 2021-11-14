@@ -33,6 +33,7 @@ def get_parameters():
         params['sfn-workflow-name'] = config['config']['sfn-workflow-name']
         params['sfn-role-arn'] = config['config']['sfn-role-arn']
         params['job-name-prefix'] = config['config']['job-name-prefix']
+        params['prep-image-uri'] = os.environ['PREPRO_IMAGE_URI']
         params['prep-input-path'] = config['preprocess']['input-data-path']
         params['prep-output-path'] = config['preprocess']['output-data-path']        
         params['train-image-uri'] = os.environ['TRAIN_IMAGE_URI']
@@ -44,13 +45,17 @@ def get_parameters():
         params['eval-data-path'] = config['evaluate']['data-path']
         params['eval-result-path'] = config['evaluate']['result-path']
 
+        params['prep-image-uri'] = '420964472730.dkr.ecr.ap-northeast-1.amazonaws.com/mlops-demo-prepro:e6d3acaf876c63271f7b7c5101c8ea5a399acd1e'
+        params['train-image-uri'] = '420964472730.dkr.ecr.ap-northeast-1.amazonaws.com/mlops-demo-train:e6d3acaf876c63271f7b7c5101c8ea5a399acd1e'
+        params['eval-image-uri'] = '420964472730.dkr.ecr.ap-northeast-1.amazonaws.com/mlops-demo-evaluate:e6d3acaf876c63271f7b7c5101c8ea5a399acd1e'
+
         print('------------------')
         print(params)
     return params
 
 
 def create_prepro_processing(params, job_name, sagemaker_role):
-    prepro_repository_uri = params['prep-input-path']
+    prepro_repository_uri = params['prep-image-uri']
 
     pre_processor = Processor(
         role=sagemaker_role,
@@ -96,7 +101,7 @@ def create_prepro_step(params, pre_processor, execution_input):
         inputs=prepro_inputs,
         outputs=prepro_outputs
     )
-
+    return processing_step
 
 def create_estimator(params, job_name, sagemaker_role):
     train_repository_uri = params['train-image-uri']
@@ -198,11 +203,11 @@ def create_evaluation_step(params, model_evaluation_processor,
     return evaluation_step
 
 
-def create_sfn_workflow(params, processing_step, training_step, evaluation_step):
+def create_sfn_workflow(params, steps):
     sfn_workflow_name = params['sfn-workflow-name']
     workflow_execution_role = params['sfn-role-arn']
 
-    workflow_graph = Chain([processing_step, training_step, evaluation_step])
+    workflow_graph = Chain(steps)
 
     branching_workflow = Workflow(
         name=sfn_workflow_name,
@@ -257,7 +262,7 @@ if __name__ == '__main__':
         execution_input, eval_job_name, estimator)
 
     branching_workflow = create_sfn_workflow(
-        params, processing_step, training_step, evaluation_step)
+        params, [processing_step, training_step, evaluation_step])
     
     # Execute workflow
     execution = branching_workflow.execute(
