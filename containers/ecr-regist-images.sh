@@ -29,6 +29,7 @@ echo "Container registered. URI:${IMAGE_URI}"
 ECR_REPOGITORY="${ECR_REPOGITORY_PREFIX}-train"
 IMAGE_URI="${REGISTRY_URL}/${ECR_REPOGITORY}"
 
+aws ecr get-login-password --region $REGION | docker login --username AWS --password-stdin 763104351884.dkr.ecr.$REGION.amazonaws.com
 aws ecr get-login-password | docker login --username AWS --password-stdin $REGISTRY_URL
 aws ecr create-repository --repository-name $ECR_REPOGITORY
 
