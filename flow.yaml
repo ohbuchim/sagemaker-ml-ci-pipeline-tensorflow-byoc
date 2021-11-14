@@ -1,17 +1,16 @@
 config:
   region: 'ap-northeast-1'
-  job-name: 'mlops-demo'
+  job-name-prefix: 'mlops-demo'
   image-name-prefix: 'mlops-demo'
 preprocess:
-  input-data-path: 's3://sagemaker-sample-data-us-east-1/tensorflow/mnist/'
-  output-data-path: 's3://sagemaker-sample-data-us-east-1/tensorflow/mnist/'
-  image-uri:
+  input-data-path: 's3://sagemaker-ap-northeast-1-420964472730/mlops-demo/data'
+  output-data-path: 's3://sagemaker-ap-northeast-1-420964472730/mlops-demo/data/PennFudanPed_Augmented'
 train:
-  image-uri: '8815969174475.dkr.ecr.us-east-1.amazonaws.com/sagemaker-tf-nightly-gpu'
+  # image-uri: '8815969174475.dkr.ecr.us-east-1.amazonaws.com/sagemaker-tf-nightly-gpu'
+  output-path: 's3://sagemaker-ap-northeast-1-420964472730/mlops-demo/train'
   hyperparameters:
     batch-size: 8
     epoch: 1
 evaluate:
-  model-path: ''
-  data-path:
-  result-path:
+  data-path: 's3://sagemaker-ap-northeast-1-420964472730/mlops-demo/data/PennFudanPed_Augmented'
+  result-path: 's3://sagemaker-ap-northeast-1-420964472730/mlops-demo/evaluate'

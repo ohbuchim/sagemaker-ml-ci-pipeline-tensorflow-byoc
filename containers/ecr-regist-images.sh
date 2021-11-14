@@ -13,6 +13,7 @@ echo ${IMAGE_TAG}
 # prepro
 ECR_REPOGITORY="${ECR_REPOGITORY_PREFIX}-prepro"
 IMAGE_URI="${REGISTRY_URL}/${ECR_REPOGITORY}"
+PREPRO_IMAGE_URI=$IMAGE_URI
 
 aws ecr get-login-password | docker login --username AWS --password-stdin $REGISTRY_URL
 aws ecr create-repository --repository-name $ECR_REPOGITORY
@@ -28,6 +29,7 @@ echo "Container registered. URI:${IMAGE_URI}"
 # train
 ECR_REPOGITORY="${ECR_REPOGITORY_PREFIX}-train"
 IMAGE_URI="${REGISTRY_URL}/${ECR_REPOGITORY}"
+TRAIN_IMAGE_URI=$IMAGE_URI
 
 aws ecr get-login-password --region $REGION | docker login --username AWS --password-stdin 763104351884.dkr.ecr.$REGION.amazonaws.com
 aws ecr get-login-password | docker login --username AWS --password-stdin $REGISTRY_URL
@@ -44,6 +46,7 @@ echo "Container registered. URI:${IMAGE_URI}"
 # evaluate
 ECR_REPOGITORY="${ECR_REPOGITORY_PREFIX}-evaluate"
 IMAGE_URI="${REGISTRY_URL}/${ECR_REPOGITORY}"
+EVALUATE_IMAGE_URI=$IMAGE_URI
 
 aws ecr get-login-password | docker login --username AWS --password-stdin $REGISTRY_URL
 aws ecr create-repository --repository-name $ECR_REPOGITORY

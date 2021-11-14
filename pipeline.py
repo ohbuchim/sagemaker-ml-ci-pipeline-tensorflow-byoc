@@ -24,22 +24,24 @@ def get_parameters():
     params = {}
     with open(config_name) as file:
         config = yaml.safe_load(file)
+        params['job-name-prefix'] = config['config']['job-name-prefix']
         params['prep-input-path'] = config['preprocess']['input-data-path']
-        params['prep-output-path'] = config['preprocess']['output-data-path']
-        params['job-name-prefix'] = config['config']['job-name']
-        params['train-image-uri'] = config['train']['image-uri']
+        params['prep-output-path'] = config['preprocess']['output-data-path']        
+        params['train-image-uri'] = os.environ['TRAIN_IMAGE_URI']
+        params['train-output-path'] = config['train']['output-path']
         params['hyperparameters'] = {}
         params['hyperparameters']['batch-size'] = config['train']['hyperparameters']['batch-size']
         params['hyperparameters']['epoch'] = config['train']['hyperparameters']['epoch']
-        params['eval-model-path'] = config['evaluate']['model-path']
+        params['eval-image-uri'] = os.environ['EVALUATE_IMAGE_URI']
         params['eval-data-path'] = config['evaluate']['data-path']
         params['eval-result-path'] = config['evaluate']['result-path']
+
         print('------------------')
         print(params)
     return params
 
 
-params = get_parameters()
+
 # REGION='us-east-1'
 # BUCKET='sagemaker-us-east-1-420964472730'
 # FLOW_NAME='flow_{}'.format(id) 
@@ -60,7 +62,9 @@ params = get_parameters()
 #     return estimator
 
 
-# if __name__ == '__main__':
+if __name__ == '__main__':
+
+    params = get_parameters()
 #     # flow.yaml の定義を環境変数経由で受け取る
 #     # buildspec.yaml の ENV へ直接書き込んでも良いかも
 #     parser = argparse.ArgumentParser()
