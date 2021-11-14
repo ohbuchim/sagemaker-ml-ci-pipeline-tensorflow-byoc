@@ -9,7 +9,7 @@ preprocess:
 train:
   image-uri: '8815969174475.dkr.ecr.us-east-1.amazonaws.com/sagemaker-tf-nightly-gpu'
   hyperparameters:
-    batch-size: 8
+    batch-size: 4
     epoch: 1
 evaluate:
   model-path: ''
