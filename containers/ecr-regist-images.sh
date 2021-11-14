@@ -10,6 +10,21 @@ IMAGE_TAG="$(git rev-parse HEAD)"
 echo "========"
 echo ${IMAGE_TAG}
 
+# prepro
+ECR_REPOGITORY="${ECR_REPOGITORY_PREFIX}-prepro"
+IMAGE_URI="${REGISTRY_URL}/${ECR_REPOGITORY}"
+
+aws ecr get-login-password | docker login --username AWS --password-stdin $REGISTRY_URL
+aws ecr create-repository --repository-name $ECR_REPOGITORY
+
+docker build -t $ECR_REPOGITORY containers/prepro/
+docker tag ${ECR_REPOGITORY} $IMAGE_URI:${IMAGE_TAG}
+docker push $IMAGE_URI:${IMAGE_TAG}
+docker tag ${ECR_REPOGITORY} "$IMAGE_URI:latest"
+docker push "$IMAGE_URI:latest"
+
+echo "Container registered. URI:${IMAGE_URI}"
+
 # train
 ECR_REPOGITORY="${ECR_REPOGITORY_PREFIX}-train"
 IMAGE_URI="${REGISTRY_URL}/${ECR_REPOGITORY}"

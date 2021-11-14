@@ -1,24 +1,11 @@
-FROM tensorflow/tensorflow:nightly-gpu
+# FROM python:3.7-slim-buster
+FROM 420964472730.dkr.ecr.ap-northeast-1.amazonaws.com/mlops-demo-evaluate:base
 
-# かつては RUN pip install sagemaker-containers を行っていた
-# install the SageMaker Training Toolkit 
-RUN pip3 install sagemaker-training
+COPY requirements.txt ./
+RUN apt-get update && apt-get install -y build-essential
+RUN pip3 install --upgrade pip
+RUN pip uninstall torch torchvision -y && pip install --no-cache-dir -U -r requirements.txt
+# RUN pip3 install --no-cache-dir -qU boto3 pandas==0.25.3 scikit-learn==0.20.0 torch==1.9.1 torchvision==0.10.1 pycocotools==2.0.2
+COPY src/* /opt/ml/processing/input/code/
 
-# Copies the training code inside the container
-# Directory structure in SageMaker training instance is followings.
-# opt/
-# ├ /ml
-#    ├ code
-#      ├ tf_model.py
-#      └ train.py
-# └ ml/
-#  ├ input/
-#    └ data/
-#  └ model/
-COPY mnist /opt/ml/code/
-
-# SageMaker SDK で学習のために使うスクリプト(エントリーポイントと呼ばれている)を指定。
-# SAGEMAKER_PROGRAM はデフォルトでは /opt/ml/code/ 以下を指す。
-# 絶対パスを指定しても良い。
-# define train.py as the script entry point
-ENV SAGEMAKER_PROGRAM train.py
+ENTRYPOINT ["python3", "/opt/ml/processing/input/code/evaluate.py"]
