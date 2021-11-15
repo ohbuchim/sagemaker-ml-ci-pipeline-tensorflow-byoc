@@ -117,13 +117,14 @@ def create_estimator(params, job_name, sagemaker_role):
         metric_definitions=metric_definitions,
         instance_count=1,
         instance_type=instance_type,
+        # base_job_name=job_name,
         hyperparameters={
             'batch-size': params['hyperparameters']['batch-size'],
             'test-batch-size': 4,
             'lr': 0.01,
             'epochs': params['hyperparameters']['epoch']
         },
-        output_path=os.path.join(params['train-output-path'], job_name))
+        output_path=params['train-output-path'])
 
     return estimator
 
@@ -162,6 +163,7 @@ def create_evaluation_step(params, model_evaluation_processor,
     evaluation_output_destination = os.path.join(
         params['eval-result-path'], job_name)
     prepro_input_data = params['prep-input-path']
+    trained_model_data = os.path.join(params['train-output-path'], 'output/model.tar.gz')
     model_dir = '/opt/ml/processing/model'
     data_dir = '/opt/ml/processing/test'
     output_dir = '/opt/ml/processing/evaluation'
@@ -177,7 +179,7 @@ def create_evaluation_step(params, model_evaluation_processor,
         # model path
         ProcessingInput(
     #         source=execution_input["TrainingOutputModel"],
-            source=estimator.model_data,
+            source=trained_model_data,
             destination=model_dir,
             input_name="model-dir",
         ),
@@ -262,7 +264,8 @@ if __name__ == '__main__':
         execution_input, eval_job_name, estimator)
 
     branching_workflow = create_sfn_workflow(
-        params, [processing_step, training_step, evaluation_step])
+        # params, [processing_step, training_step, evaluation_step])
+        params, [training_step, evaluation_step])
     
     # Execute workflow
     execution = branching_workflow.execute(
