@@ -1,4 +1,3 @@
-import argparse
 import boto3
 import logging
 import os
@@ -45,9 +44,10 @@ def get_parameters():
         params['eval-data-path'] = config['evaluate']['data-path']
         params['eval-result-path'] = config['evaluate']['result-path']
 
-        params['prep-image-uri'] = '420964472730.dkr.ecr.ap-northeast-1.amazonaws.com/mlops-demo-prepro:e6d3acaf876c63271f7b7c5101c8ea5a399acd1e'
-        params['train-image-uri'] = '420964472730.dkr.ecr.ap-northeast-1.amazonaws.com/mlops-demo-train:e6d3acaf876c63271f7b7c5101c8ea5a399acd1e'
-        params['eval-image-uri'] = '420964472730.dkr.ecr.ap-northeast-1.amazonaws.com/mlops-demo-evaluate:e6d3acaf876c63271f7b7c5101c8ea5a399acd1e'
+        # !!!!!
+        # params['prep-image-uri'] = '420964472730.dkr.ecr.ap-northeast-1.amazonaws.com/mlops-demo-prepro:e6d3acaf876c63271f7b7c5101c8ea5a399acd1e'
+        # params['train-image-uri'] = '420964472730.dkr.ecr.ap-northeast-1.amazonaws.com/mlops-demo-train:e6d3acaf876c63271f7b7c5101c8ea5a399acd1e'
+        # params['eval-image-uri'] = '420964472730.dkr.ecr.ap-northeast-1.amazonaws.com/mlops-demo-evaluate:e6d3acaf876c63271f7b7c5101c8ea5a399acd1e'
 
         print('------------------')
         print(params)
@@ -103,6 +103,7 @@ def create_prepro_step(params, pre_processor, execution_input):
     )
     return processing_step
 
+
 def create_estimator(params, job_name, sagemaker_role):
     train_repository_uri = params['train-image-uri']
     instance_type = 'ml.p3.2xlarge'
@@ -130,8 +131,8 @@ def create_estimator(params, job_name, sagemaker_role):
 
 
 def create_training_step(params, estimator, execution_input):
-    # prepro_output_data = params['prep-output-path']#!!!!!
-    prepro_output_data =  params['prep-input-path']
+    prepro_output_data = params['prep-output-path']#!!!!!
+    # prepro_output_data =  params['prep-input-path']
     training_input = TrainingInput(s3_data=prepro_output_data,
                                    input_mode='FastFile')
 
@@ -268,8 +269,8 @@ if __name__ == '__main__':
         execution_input, eval_job_name, train_job_name)
 
     branching_workflow = create_sfn_workflow(
-        # params, [processing_step, training_step, evaluation_step])
-        params, [training_step, evaluation_step])
+        params, [processing_step, training_step, evaluation_step])#!!!!
+        # params, [training_step, evaluation_step])
     
     # Execute workflow
     execution = branching_workflow.execute(
