@@ -131,7 +131,8 @@ def create_estimator(params, job_name, sagemaker_role):
 
 def create_training_step(params, estimator, execution_input):
     prepro_output_data = params['prep-output-path']
-    training_input = TrainingInput(s3_data=prepro_output_data,
+    # training_input = TrainingInput(s3_data=prepro_output_data,##!!!!
+    training_input = TrainingInput(s3_data=prepro_input_data,
                                    input_mode='FastFile')
 
     training_step = TrainingStep(
@@ -163,7 +164,8 @@ def create_evaluation_step(params, model_evaluation_processor,
     evaluation_output_destination = os.path.join(
         params['eval-result-path'], job_name)
     prepro_input_data = params['prep-input-path']
-    trained_model_data = os.path.join(params['train-output-path'], job_name, 'output/model.tar.gz')
+    trained_model_data = os.path.join(params['train-output-path'],
+                                      job_name, 'output/model.tar.gz')
     model_dir = '/opt/ml/processing/model'
     data_dir = '/opt/ml/processing/test'
     output_dir = '/opt/ml/processing/evaluation'
@@ -278,20 +280,6 @@ if __name__ == '__main__':
             "EvaluationJobName": eval_job_name,
         }
     )
-
-#     # flow.yaml の定義を環境変数経由で受け取る
-#     # buildspec.yaml の ENV へ直接書き込んでも良いかも
-#     parser = argparse.ArgumentParser()
-#     parser.add_argument('--input-data-path', type=str, default=os.environ['INPUT_DATA_PATH'])
-#     parser.add_argument('--processed-data-path', type=str, default=os.environ['PROCESSED_DATA_PATH'])
-#     parser.add_argument('--train-job-name', type=str, default=os.environ['TRAIN_JOB_NAME'])
-#     parser.add_argument('--train-image-url', type=str, default=os.environ['TRAIN_IMAGE_URL'])
-#     parser.add_argument('--batch-size', type=str, default=os.environ['BATCH_SIZE'])
-#     parser.add_argument('--epoch', type=str, default=os.environ['EPOCH'])
-#     parser.add_argument('--model-path', type=str, default=os.environ['MODEL_PATH'])
-#     parser.add_argument('--evaluate-data-path', type=str, default=os.environ['EVAL_DATA_PATH'])
-#     parser.add_argument('--evaluate-result-path', type=str, default=os.environ['EVALUATE_RESULT'])
-#     args = parser.parse_args()
 
 #     # SFn の実行に必要な情報を渡す際のスキーマを定義します
 #     schema = {'TrainJobName': str}
