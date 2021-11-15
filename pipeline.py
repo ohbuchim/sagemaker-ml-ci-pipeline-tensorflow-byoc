@@ -160,12 +160,12 @@ def create_evaluation_processor(params, sagemaker_role):
 
 
 def create_evaluation_step(params, model_evaluation_processor,
-                           execution_input, job_name, estimator):
+                           execution_input, job_name, train_job_name):
     evaluation_output_destination = os.path.join(
         params['eval-result-path'], job_name)
     prepro_input_data = params['prep-input-path']
     trained_model_data = os.path.join(params['train-output-path'],
-                                      job_name, 'output/model.tar.gz')
+                                      train_job_name, 'output/model.tar.gz')
     model_dir = '/opt/ml/processing/model'
     data_dir = '/opt/ml/processing/test'
     output_dir = '/opt/ml/processing/evaluation'
@@ -265,7 +265,7 @@ if __name__ == '__main__':
     model_evaluation_processor = create_evaluation_processor(params, sagemaker_role)
     evaluation_step = create_evaluation_step(
         params, model_evaluation_processor,
-        execution_input, eval_job_name, estimator)
+        execution_input, eval_job_name, train_job_name)
 
     branching_workflow = create_sfn_workflow(
         # params, [processing_step, training_step, evaluation_step])
