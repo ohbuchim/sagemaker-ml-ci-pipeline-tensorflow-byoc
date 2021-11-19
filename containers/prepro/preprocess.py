@@ -74,7 +74,7 @@ def main(args):
     Path(args.output_dir, "PedMasks").mkdir(exist_ok=True)
 
     # augment images
-    for factor in [0.5, 1.25, 2.0]:
+    for factor in [0.5, 2.0]:
         change_image("color", dataset, args.output_dir, factor)
         change_image("brightness", dataset, args.output_dir, factor)
 
