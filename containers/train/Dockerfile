@@ -1,5 +1,5 @@
 
-FROM 763104351884.dkr.ecr.ap-northeast-1.amazonaws.com/pytorch-training:1.8.0-gpu-py36
+FROM 763104351884.dkr.ecr.us-east-1.amazonaws.com/pytorch-training:1.8.0-gpu-py36
  
  COPY requirements.txt ./
 # RUN pip install  numpy

@@ -62,13 +62,13 @@ def create_prepro_processing(params, job_name, sagemaker_role):
         image_uri=prepro_repository_uri,
         instance_count=1, 
         instance_type="ml.m5.xlarge",
-        volume_size_in_gb=16, 
-        volume_kms_key=None, 
-        output_kms_key=None, 
-        max_runtime_in_seconds=86400,  # the default value is 24 hours(60*60*24)
-        sagemaker_session=None, 
-        env=None, 
-        tags=None, 
+        volume_size_in_gb=16,
+        volume_kms_key=None,
+        output_kms_key=None,
+        max_runtime_in_seconds=86400,  # default is 24 hours(60*60*24)
+        sagemaker_session=None,
+        env=None,
+        tags=None,
         network_config=None
     )
     return pre_processor
@@ -145,7 +145,7 @@ def create_training_step(params, estimator, execution_input):
         estimator=estimator,
         data={"training": training_input},
         job_name=execution_input["TrainingJobName"],
-#     hyperparameters=execution_input["TrainingParameters"],
+        # hyperparameters=execution_input["TrainingParameters"],
         wait_for_completion=True,
     )
 
@@ -178,14 +178,12 @@ def create_evaluation_step(params, model_evaluation_processor,
     inputs_evaluation = [
         # data path for model evaluation
         ProcessingInput(
-    #         source=execution_input["PreprocessingOutputDataTest"],
             source=prepro_input_data,
             destination=data_dir,
             input_name="data-dir",
         ),
         # model path
         ProcessingInput(
-    #         source=execution_input["TrainingOutputModel"],
             source=trained_model_data,
             destination=model_dir,
             input_name="model-dir",
@@ -195,7 +193,6 @@ def create_evaluation_step(params, model_evaluation_processor,
     outputs_evaluation = [
         ProcessingOutput(
             source=output_dir,
-    #         destination=execution_input["EvaluationProcessingOutput"],
             destination=evaluation_output_destination,
             output_name="output-dir",
         ),
@@ -261,25 +258,27 @@ if __name__ == '__main__':
         }
     )
 
-    pre_processor = create_prepro_processing(params, prepro_job_name, sagemaker_role)
-    processing_step = create_prepro_step(params, pre_processor, execution_input)
+    pre_processor = create_prepro_processing(params,
+                                             prepro_job_name, sagemaker_role)
+    processing_step = create_prepro_step(params,
+                                         pre_processor, execution_input)
 
     estimator = create_estimator(params, train_job_name, sagemaker_role)
     training_step = create_training_step(params, estimator, execution_input)
 
-    model_evaluation_processor = create_evaluation_processor(params, sagemaker_role)
+    model_evaluation_processor = create_evaluation_processor(params,
+                                                             sagemaker_role)
     evaluation_step = create_evaluation_step(
         params, model_evaluation_processor,
         execution_input, eval_job_name, train_job_name)
 
     branching_workflow = create_sfn_workflow(
-        params, [processing_step, training_step, evaluation_step])#!!!!
-        # params, [training_step, evaluation_step])
-    
+        params, [processing_step, training_step, evaluation_step])
+
     # Execute workflow
     execution = branching_workflow.execute(
         inputs={
-            # Each pre processing job (SageMaker processing job) requires a unique name,
+            # Each pre processing job requires a unique name
             "PreprocessingJobName": prepro_job_name,
             "TrainingJobName": train_job_name,
             "EvaluationJobName": eval_job_name,
