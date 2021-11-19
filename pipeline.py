@@ -83,14 +83,14 @@ def create_prepro_step(params, pre_processor, execution_input):
     prepro_inputs = [
         ProcessingInput(
             source=prepro_input_data,
-            destination="/opt/ml/processing/input",
+            destination=input_dir,
             input_name="input-data"
         )
     ]
 
     prepro_outputs = [
         ProcessingOutput(
-            source="/opt/ml/processing/train",
+            source=output_dir,
             destination=prepro_output_data,
             output_name="processed-data",
         )
