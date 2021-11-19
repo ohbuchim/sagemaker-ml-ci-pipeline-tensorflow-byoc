@@ -1,5 +1,5 @@
 version: 0.2
-# test3
+#image: standard:5.0-21.01.08
 env:
   variables:
     # SOURCE_VERSION: $(echo $CODEBUILD_RESOLVED_SOURCE_VERSION)
@@ -8,7 +8,7 @@ env:
 phases:
   install:
     runtime-versions:
-      # docker: 18
+      docker: 18
       python: 3.8
     commands:
       - pip install -r requirements.txt
