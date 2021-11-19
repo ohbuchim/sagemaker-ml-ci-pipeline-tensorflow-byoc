@@ -1,9 +1,5 @@
-# ACCOUNT_ID=`aws sts get-caller-identity --query 'Account' --output text`
-# ACCOUNT_ID='420964472730' 
-# REGION='us-east-1'
 REGION=${AWS_DEFAULT_REGION}
 REGISTRY_URL="${ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com" 
-# ECR_REPOGITORY='sagemaker-tf-nightly-gpu'
 IMAGE_TAG="$(git rev-parse HEAD)"
 # IMAGE_TAG="$(git rev-parse --short HEAD)"
 

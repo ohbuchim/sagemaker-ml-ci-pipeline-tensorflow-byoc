@@ -77,6 +77,8 @@ def create_prepro_processing(params, job_name, sagemaker_role):
 def create_prepro_step(params, pre_processor, execution_input):
     prepro_input_data = params['prep-input-path']
     prepro_output_data = params['prep-output-path']
+    input_dir = '/opt/ml/processing/input'
+    output_dir = '/opt/ml/processing/output'
 
     prepro_inputs = [
         ProcessingInput(
@@ -99,7 +101,9 @@ def create_prepro_step(params, pre_processor, execution_input):
         processor=pre_processor,
         job_name=execution_input["PreprocessingJobName"],
         inputs=prepro_inputs,
-        outputs=prepro_outputs
+        outputs=prepro_outputs,
+        container_arguments=["--input-dir", input_dir,
+                             "--output-dir", output_dir]
     )
     return processing_step
 
