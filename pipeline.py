@@ -122,7 +122,6 @@ def create_estimator(params, job_name, sagemaker_role):
         metric_definitions=metric_definitions,
         instance_count=1,
         instance_type=instance_type,
-        # base_job_name=job_name,
         hyperparameters={
             'batch-size': params['hyperparameters']['batch-size'],
             'test-batch-size': 4,
@@ -135,8 +134,7 @@ def create_estimator(params, job_name, sagemaker_role):
 
 
 def create_training_step(params, estimator, execution_input):
-    prepro_output_data = params['prep-output-path']#!!!!!
-    # prepro_output_data =  params['prep-input-path']
+    prepro_output_data = params['prep-output-path']
     training_input = TrainingInput(s3_data=prepro_output_data,
                                    input_mode='FastFile')
 
@@ -145,7 +143,6 @@ def create_training_step(params, estimator, execution_input):
         estimator=estimator,
         data={"training": training_input},
         job_name=execution_input["TrainingJobName"],
-        # hyperparameters=execution_input["TrainingParameters"],
         wait_for_completion=True,
     )
 
