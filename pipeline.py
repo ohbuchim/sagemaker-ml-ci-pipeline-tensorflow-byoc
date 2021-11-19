@@ -135,8 +135,7 @@ def create_estimator(params, job_name, sagemaker_role):
 
 def create_training_step(params, estimator, execution_input):
     prepro_output_data = params['prep-output-path']
-    training_input = TrainingInput(s3_data=prepro_output_data,
-                                   input_mode='FastFile')
+    training_input = TrainingInput(s3_data=prepro_output_data)
 
     training_step = TrainingStep(
         "SageMaker Training Step",
