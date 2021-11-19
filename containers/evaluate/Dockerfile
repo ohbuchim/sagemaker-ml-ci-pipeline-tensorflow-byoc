@@ -1,5 +1,5 @@
 # FROM python:3.7-slim-buster
-FROM 420964472730.dkr.ecr.ap-northeast-1.amazonaws.com/mlops-demo-evaluate:base
+FROM 222136011322.dkr.ecr.us-east-1.amazonaws.com/mlops-demo-evaluate:base
 
 COPY requirements.txt ./
 RUN apt-get update && apt-get install -y build-essential

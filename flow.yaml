@@ -1,18 +1,18 @@
 config:
-  region: 'ap-northeast-1'
+  region: 'us-east-1'
   job-name-prefix: 'mlops-demo'
   image-name-prefix: 'mlops-demo'
-  sfn-workflow-name: 'mlops-demo-2'
-  sfn-role-arn: 'arn:aws:iam::420964472730:role/service-role/AmazonSageMaker-StepFunctionsWorkflowExecutionRole-sample'
-  sagemaker-role: 'arn:aws:iam::420964472730:role/service-role/AmazonSageMaker-ExecutionRole-20201204T095531'
+  sfn-workflow-name: 'mlops-demo'
+  sfn-role-arn: 'arn:aws:iam::222136011322:role/StepFunctionsWorkflowExecutionRole-dev'
+  sagemaker-role: 'arn:aws:iam::222136011322:role/service-role/AmazonSageMaker-ExecutionRole-20211119T091068'
 preprocess:
-  input-data-path: 's3://sagemaker-ap-northeast-1-420964472730/mlops-demo/data'
-  output-data-path: 's3://sagemaker-ap-northeast-1-420964472730/mlops-demo/data/PennFudanPed_Augmented'
+  input-data-path: 's3://sagemaker-us-east-1-222136011322/data/'
+  output-data-path: 's3://sagemaker-us-east-1-222136011322/data/PennFudanPed_Augmented'
 train:
-  output-path: 's3://sagemaker-ap-northeast-1-420964472730/mlops-demo/train'
+  output-path: 's3://sagemaker-us-east-1-222136011322/train'
   hyperparameters:
     batch-size: 4
     epoch: 1
 evaluate:
-  data-path: 's3://sagemaker-ap-northeast-1-420964472730/mlops-demo/data'
-  result-path: 's3://sagemaker-ap-northeast-1-420964472730/mlops-demo/evaluate'
+  data-path: 's3://sagemaker-us-east-1-222136011322/data'
+  result-path: 's3://sagemaker-us-east-1-222136011322/evaluate'
