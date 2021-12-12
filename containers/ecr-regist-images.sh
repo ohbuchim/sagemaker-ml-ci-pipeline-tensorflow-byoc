@@ -1,10 +1,13 @@
 REGION=${AWS_DEFAULT_REGION}
 REGISTRY_URL="${ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com" 
-IMAGE_TAG="$(git rev-parse HEAD)"
+# IMAGE_TAG="$(git rev-parse HEAD)"
 # IMAGE_TAG="$(git rev-parse --short HEAD)"
 
 echo "========"
 echo ${IMAGE_TAG}
+echo "========"
+echo ${EXEC_ID}
+IMAGE_TAG=${EXEC_ID}
 
 # prepro
 ECR_REPOGITORY="${ECR_REPOGITORY_PREFIX}-prepro"
