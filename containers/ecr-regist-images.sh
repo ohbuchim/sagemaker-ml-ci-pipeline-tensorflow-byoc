@@ -7,6 +7,8 @@ echo "========"
 echo ${IMAGE_TAG}
 echo "========"
 echo ${EXEC_ID}
+echo "========"
+echo ${TRAIN_JOB_NAM}
 IMAGE_TAG=${EXEC_ID}
 
 # prepro
