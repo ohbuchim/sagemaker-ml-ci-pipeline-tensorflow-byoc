@@ -39,6 +39,7 @@ def get_parameters():
         params['train-job-name'] = os.environ['TRAIN_JOB_NAME']
         params['train-image-uri'] = os.environ['TRAIN_IMAGE_URI']
         params['train-output-path'] = config['train']['output-path']
+        params['trained-model-s3'] = os.environ['TRAINED_MODEL_S3']
         params['hyperparameters'] = {}
         params['hyperparameters']['batch-size'] = config['train']['hyperparameters']['batch-size']
         params['hyperparameters']['epoch'] = config['train']['hyperparameters']['epoch']
@@ -47,17 +48,12 @@ def get_parameters():
         params['eval-data-path'] = config['evaluate']['data-path']
         params['eval-result-path'] = config['evaluate']['result-path']
 
-        # !!!!!
-        # params['prep-image-uri'] = '420964472730.dkr.ecr.ap-northeast-1.amazonaws.com/mlops-demo-prepro:e6d3acaf876c63271f7b7c5101c8ea5a399acd1e'
-        # params['train-image-uri'] = '420964472730.dkr.ecr.ap-northeast-1.amazonaws.com/mlops-demo-train:e6d3acaf876c63271f7b7c5101c8ea5a399acd1e'
-        # params['eval-image-uri'] = '420964472730.dkr.ecr.ap-northeast-1.amazonaws.com/mlops-demo-evaluate:e6d3acaf876c63271f7b7c5101c8ea5a399acd1e'
-
         print('------------------')
         print(params)
     return params
 
 
-def create_prepro_processing(params, job_name, sagemaker_role):
+def create_prepro_processing(params, sagemaker_role):
     prepro_repository_uri = params['prep-image-uri']
 
     pre_processor = Processor(
@@ -169,8 +165,7 @@ def create_evaluation_step(params, model_evaluation_processor,
     evaluation_output_destination = os.path.join(
         params['eval-result-path'], job_name)
     prepro_input_data = params['prep-input-path']
-    trained_model_data = os.path.join(params['train-output-path'],
-                                      train_job_name, 'output/model.tar.gz')
+    trained_model_data = params['trained-model-s3']
     model_dir = '/opt/ml/processing/model'
     data_dir = '/opt/ml/processing/test'
     output_dir = '/opt/ml/processing/evaluation'
@@ -242,7 +237,7 @@ if __name__ == '__main__':
 
     # timestamp = datetime.now(tz=JST).strftime('%Y%m%d-%H%M%S')
 
-    job_name_prefix = params['job-name-prefix'] 
+    # job_name_prefix = params['job-name-prefix']
     # job_name = job_name_prefix + '-' + timestamp
 
     sagemaker_role = params['sagemaker-role']
@@ -262,7 +257,7 @@ if __name__ == '__main__':
     )
 
     pre_processor = create_prepro_processing(params,
-                                             prepro_job_name, sagemaker_role)
+                                             sagemaker_role)
     processing_step = create_prepro_step(params,
                                          pre_processor, execution_input)
 
