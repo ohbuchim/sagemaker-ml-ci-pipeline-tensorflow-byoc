@@ -4,11 +4,11 @@ REGISTRY_URL="${ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com"
 # IMAGE_TAG="$(git rev-parse --short HEAD)"
 
 echo "========"
-echo ${IMAGE_TAG}
-echo "========"
 echo ${EXEC_ID}
 echo "========"
-echo ${TRAIN_JOB_NAM}
+echo ${TRAIN_JOB_NAME}
+echo "========"
+echo ${TRAINED_MODEL_S3}
 IMAGE_TAG=${EXEC_ID}
 
 # prepro
