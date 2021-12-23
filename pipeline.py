@@ -32,14 +32,17 @@ def get_parameters():
         params['sfn-workflow-name'] = config['config']['sfn-workflow-name']
         params['sfn-role-arn'] = config['config']['sfn-role-arn']
         params['job-name-prefix'] = config['config']['job-name-prefix']
+        params['prep-job-name'] = os.environ['PREP_JOB_NAME']
         params['prep-image-uri'] = os.environ['PREPRO_IMAGE_URI']
         params['prep-input-path'] = config['preprocess']['input-data-path']
-        params['prep-output-path'] = config['preprocess']['output-data-path']        
+        params['prep-output-path'] = config['preprocess']['output-data-path']
+        params['train-job-name'] = os.environ['TRAIN_JOB_NAME']     
         params['train-image-uri'] = os.environ['TRAIN_IMAGE_URI']
         params['train-output-path'] = config['train']['output-path']
         params['hyperparameters'] = {}
         params['hyperparameters']['batch-size'] = config['train']['hyperparameters']['batch-size']
         params['hyperparameters']['epoch'] = config['train']['hyperparameters']['epoch']
+        params['eval-job-name'] = os.environ['EVAL_JOB_NAME']   
         params['eval-image-uri'] = os.environ['EVALUATE_IMAGE_URI']
         params['eval-data-path'] = config['evaluate']['data-path']
         params['eval-result-path'] = config['evaluate']['result-path']
@@ -108,7 +111,7 @@ def create_prepro_step(params, pre_processor, execution_input):
     return processing_step
 
 
-def create_estimator(params, job_name, sagemaker_role):
+def create_estimator(params, sagemaker_role):
     train_repository_uri = params['train-image-uri']
     instance_type = 'ml.p3.2xlarge'
 
@@ -232,20 +235,23 @@ if __name__ == '__main__':
     params = get_parameters()
 
     # 暫定的にプロセスIDの代わりにタイムスタンプを使用
-    from datetime import datetime
-    from dateutil import tz
+    # from datetime import datetime
+    # from dateutil import tz
 
-    JST = tz.gettz('Asia/Tokyo')
+    # JST = tz.gettz('Asia/Tokyo')
 
-    timestamp = datetime.now(tz=JST).strftime('%Y%m%d-%H%M%S')
+    # timestamp = datetime.now(tz=JST).strftime('%Y%m%d-%H%M%S')
 
     job_name_prefix = params['job-name-prefix'] 
-    job_name = job_name_prefix + '-' + timestamp
+    # job_name = job_name_prefix + '-' + timestamp
 
     sagemaker_role = params['sagemaker-role']
-    prepro_job_name = 'prepro-' + job_name
-    train_job_name = 'train-' + job_name
-    eval_job_name = 'eval-' + job_name
+    # prepro_job_name = 'prepro-' + job_name
+    # train_job_name = 'train-' + job_name
+    # eval_job_name = 'eval-' + job_name
+    prepro_job_name = params['prep-job-name']
+    train_job_name = params['train-job-name']
+    eval_job_name = params['eval-job-name']
 
     execution_input = ExecutionInput(
         schema={
@@ -260,7 +266,7 @@ if __name__ == '__main__':
     processing_step = create_prepro_step(params,
                                          pre_processor, execution_input)
 
-    estimator = create_estimator(params, train_job_name, sagemaker_role)
+    estimator = create_estimator(params, sagemaker_role)
     training_step = create_training_step(params, estimator, execution_input)
 
     model_evaluation_processor = create_evaluation_processor(params,

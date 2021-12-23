@@ -12,7 +12,7 @@ train:
   output-path: 's3://sagemaker-us-east-1-222136011322/train'
   hyperparameters:
     batch-size: 4
-    epoch: 2
+    epoch: 1
 evaluate:
   data-path: 's3://sagemaker-us-east-1-222136011322/data'
   result-path: 's3://sagemaker-us-east-1-222136011322/evaluate'
