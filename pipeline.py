@@ -3,6 +3,10 @@ import logging
 import os
 import time
 import yaml
+import ast
+import pymysql
+import base64
+from botocore.exceptions import ClientError
 
 import sagemaker
 from sagemaker import get_execution_role
@@ -28,10 +32,14 @@ def get_parameters():
     params = {}
     with open(config_name) as file:
         config = yaml.safe_load(file)
-        params['sagemaker-role'] = config['config']['sagemaker-role']
+        params['region'] = config['config']['region']
+        params['sagemaker-role-arn'] = config['config']['sagemaker-role-arn']
         params['sfn-workflow-name'] = config['config']['sfn-workflow-name']
         params['sfn-role-arn'] = config['config']['sfn-role-arn']
         params['job-name-prefix'] = config['config']['job-name-prefix']
+        params['secretsmanager-arn'] = config['config']['secretsmanager-arn']
+        params['mlflow-server-uri'] = config['experiments']['mlflow-server-uri']
+        params['experiment-name'] = config['experiments']['experiment-name']
         params['prep-job-name'] = os.environ['PREP_JOB_NAME']
         params['prep-image-uri'] = os.environ['PREPRO_IMAGE_URI']
         params['prep-input-path'] = config['preprocess']['input-data-path']
@@ -39,7 +47,6 @@ def get_parameters():
         params['train-job-name'] = os.environ['TRAIN_JOB_NAME']
         params['train-image-uri'] = os.environ['TRAIN_IMAGE_URI']
         params['train-output-path'] = config['train']['output-path']
-        params['trained-model-s3'] = os.environ['TRAINED_MODEL_S3']
         params['hyperparameters'] = {}
         params['hyperparameters']['batch-size'] = config['train']['hyperparameters']['batch-size']
         params['hyperparameters']['epoch'] = config['train']['hyperparameters']['epoch']
@@ -48,12 +55,15 @@ def get_parameters():
         params['eval-data-path'] = config['evaluate']['data-path']
         params['eval-result-path'] = config['evaluate']['result-path']
 
-        print('------------------')
-        print(params)
+        # !!!!!
+        # params['prep-image-uri'] = '420964472730.dkr.ecr.ap-northeast-1.amazonaws.com/mlops-demo-prepro:e6d3acaf876c63271f7b7c5101c8ea5a399acd1e'
+        # params['train-image-uri'] = '420964472730.dkr.ecr.ap-northeast-1.amazonaws.com/mlops-demo-train:e6d3acaf876c63271f7b7c5101c8ea5a399acd1e'
+        # params['eval-image-uri'] = '420964472730.dkr.ecr.ap-northeast-1.amazonaws.com/mlops-demo-evaluate:e6d3acaf876c63271f7b7c5101c8ea5a399acd1e'
+
     return params
 
 
-def create_prepro_processing(params, sagemaker_role):
+def create_prepro_processing(params, job_name, sagemaker_role):
     prepro_repository_uri = params['prep-image-uri']
 
     pre_processor = Processor(
@@ -125,7 +135,9 @@ def create_estimator(params, sagemaker_role):
             'batch-size': params['hyperparameters']['batch-size'],
             'test-batch-size': 4,
             'lr': 0.01,
-            'epochs': params['hyperparameters']['epoch']
+            'epochs': params['hyperparameters']['epoch'],
+            'experiment-name': params['experiment-name'],
+            'mlflow-server': params['mlflow-server-uri']
         },
         output_path=params['train-output-path'])
 
@@ -165,7 +177,8 @@ def create_evaluation_step(params, model_evaluation_processor,
     evaluation_output_destination = os.path.join(
         params['eval-result-path'], job_name)
     prepro_input_data = params['prep-input-path']
-    trained_model_data = params['trained-model-s3']
+    trained_model_data = os.path.join(params['train-output-path'],
+                                      train_job_name, 'output/model.tar.gz')
     model_dir = '/opt/ml/processing/model'
     data_dir = '/opt/ml/processing/test'
     output_dir = '/opt/ml/processing/evaluation'
@@ -200,7 +213,9 @@ def create_evaluation_step(params, model_evaluation_processor,
         inputs=inputs_evaluation,
         outputs=outputs_evaluation,
         container_arguments=["--data-dir", data_dir, "--model-dir", model_dir,
-                             "--output-dir", output_dir]
+                             "--output-dir", output_dir, 
+                             "--experiment-name", params['experiment-name'],
+                             "--mlflow-server", params['mlflow-server-uri']]
     )
 
     return evaluation_step
@@ -226,6 +241,87 @@ def create_sfn_workflow(params, steps):
     return branching_workflow
 
 
+def _get_secrets(params):
+    session = boto3.session.Session()
+    client = session.client(
+        service_name='secretsmanager',
+        region_name=params['region']
+    )
+    try:
+    
+        get_secret_value_response = client.get_secret_value(
+            SecretId=params['secretsmanager-arn']
+        )
+
+    except ClientError as e:
+        if e.response['Error']['Code'] == 'DecryptionFailureException':
+            # Secrets Manager can't decrypt the protected secret text using the provided KMS key.
+            # Deal with the exception here, and/or rethrow at your discretion.
+            raise e
+        elif e.response['Error']['Code'] == 'InternalServiceErrorException':
+            # An error occurred on the server side.
+            # Deal with the exception here, and/or rethrow at your discretion.
+            raise e
+        elif e.response['Error']['Code'] == 'InvalidParameterException':
+            # You provided an invalid value for a parameter.
+            # Deal with the exception here, and/or rethrow at your discretion.
+            raise e
+        elif e.response['Error']['Code'] == 'InvalidRequestException':
+            # You provided a parameter value that is not valid for the current state of the resource.
+            # Deal with the exception here, and/or rethrow at your discretion.
+            raise e
+        elif e.response['Error']['Code'] == 'ResourceNotFoundException':
+            # We can't find the resource that you asked for.
+            # Deal with the exception here, and/or rethrow at your discretion.
+            raise e
+
+        else:
+            raise e
+        
+    else:
+        # Decrypts secret using the associated KMS CMK.
+        # Depending on whether the secret is a string or binary, one of these fields will be populated.
+        if 'SecretString' in get_secret_value_response:
+            secret = get_secret_value_response['SecretString']
+        else:
+            secret = base64.b64decode(get_secret_value_response['SecretBinary'])
+        # strをdictに変換して返却
+ 
+        secret = ast.literal_eval(secret)
+        return secret
+
+def _query_rds(secrets, sql, data):
+    passwd = secrets['password']
+    username = secrets['username']
+    host = secrets['host']
+    db_name = secrets['dbInstanceIdentifier']
+
+    try:
+        conn = pymysql.connect(host=host, user=username, passwd=passwd)
+        cur = conn.cursor()
+        cur.execute(sql, data)
+        query_results = cur.fetchall()
+        conn.commit()
+
+    except Exception as e:
+        print('Databse connection failed due to {}'.format(e))
+        raise e
+    
+    finally:
+        conn.close()
+
+def insert_data(params):
+    # RDSのSecrets情報を取得
+    secrets = _get_secrets(params)
+    sql = '''INSERT INTO train.pipeline (exec_id, train_job_name, ''' + \
+        '''prep_job_name, eval_job_name, trained_model_s3) ''' + \
+        '''VALUES (%s, %s, %s, %s, %s)'''
+    data = (os.environ['EXEC_ID'], os.environ['TRAIN_JOB_NAME'], os.environ['PREP_JOB_NAME'], 
+        os.environ['EVAL_JOB_NAME'], os.environ['TRAINED_MODEL_S3'])
+
+    _query_rds(secrets, sql, data)
+
+
 if __name__ == '__main__':
     params = get_parameters()
 
@@ -237,10 +333,10 @@ if __name__ == '__main__':
 
     # timestamp = datetime.now(tz=JST).strftime('%Y%m%d-%H%M%S')
 
-    # job_name_prefix = params['job-name-prefix']
+    job_name_prefix = params['job-name-prefix'] 
     # job_name = job_name_prefix + '-' + timestamp
 
-    sagemaker_role = params['sagemaker-role']
+    sagemaker_role = params['sagemaker-role-arn']
     # prepro_job_name = 'prepro-' + job_name
     # train_job_name = 'train-' + job_name
     # eval_job_name = 'eval-' + job_name
@@ -257,7 +353,7 @@ if __name__ == '__main__':
     )
 
     pre_processor = create_prepro_processing(params,
-                                             sagemaker_role)
+                                             prepro_job_name, sagemaker_role)
     processing_step = create_prepro_step(params,
                                          pre_processor, execution_input)
 
@@ -282,6 +378,8 @@ if __name__ == '__main__':
             "EvaluationJobName": eval_job_name,
         }
     )
+    
+    insert_data(params)
 
 #     # SFn の実行に必要な情報を渡す際のスキーマを定義します
 #     schema = {'TrainJobName': str}

@@ -1,5 +1,5 @@
 version: 0.2
-#image: standard:5.0-21.10.05-
+#image: standard:5.0-21.01.08
 env:
   variables:
     # SOURCE_VERSION: $(echo $CODEBUILD_RESOLVED_SOURCE_VERSION)
