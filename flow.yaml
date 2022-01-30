@@ -11,7 +11,7 @@ experiments:
   experiment-name: 'mlops-demo'
 preprocess:
   input-data-path: 's3://sagemaker-us-east-1-lijewang2-mlops-train/data/'
-  output-data-path: 'ss3://sagemaker-us-east-1-lijewang2-mlops-train/data/PennFudanPed_Augmented'
+  output-data-path: 's3://sagemaker-us-east-1-lijewang2-mlops-train/data/PennFudanPed_Augmented'
 train:
   output-path: 's3://sagemaker-us-east-1-lijewang2-mlops-train/train'
   hyperparameters:
