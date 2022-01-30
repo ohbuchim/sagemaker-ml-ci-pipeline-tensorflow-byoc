@@ -10,7 +10,7 @@ experiments:
   mlflow-server-uri: 'http://test-mlflo-t9271u4u0pr2-b0fe8f9c802b7001.elb.us-east-1.amazonaws.com'
   experiment-name: 'mlops-demo'
 preprocess:
-  input-data-path: 's3://sagemaker-us-east-1-lijewang2-mlops-train/data/'
+  input-data-path: 's3://sagemaker-us-east-1-lijewang2-mlops-train/data/PennFudanPed'
   output-data-path: 's3://sagemaker-us-east-1-lijewang2-mlops-train/data/PennFudanPed_Augmented'
 train:
   output-path: 's3://sagemaker-us-east-1-lijewang2-mlops-train/train'
