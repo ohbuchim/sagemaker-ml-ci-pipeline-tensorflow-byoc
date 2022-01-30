@@ -8,6 +8,7 @@ env:
     - TRAIN_JOB_NAME
     - TRAINED_MODEL_S3
     - EVAL_REPORT_S3
+    - MLFLOW_SERVER_URI
 
 phases:
   install:
