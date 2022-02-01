@@ -370,48 +370,13 @@ if __name__ == '__main__':
         params, [processing_step, training_step, evaluation_step])
 
     # Execute workflow
-    execution = branching_workflow.execute(
-        inputs={
-            # Each pre processing job requires a unique name
-            "PreprocessingJobName": prepro_job_name,
-            "TrainingJobName": train_job_name,
-            "EvaluationJobName": eval_job_name,
-        }
-    )
+    # execution = branching_workflow.execute(
+    #     inputs={
+    #         # Each pre processing job requires a unique name
+    #         "PreprocessingJobName": prepro_job_name,
+    #         "TrainingJobName": train_job_name,
+    #         "EvaluationJobName": eval_job_name,
+    #     }
+    # )
     
     insert_data(params)
-
-#     # SFn の実行に必要な情報を渡す際のスキーマを定義します
-#     schema = {'TrainJobName': str}
-#     execution_input = ExecutionInput(schema=schema)
-
-#     # SFn のワークフローの定義を記載します
-#     inputs = {'TrainJobName': TRAINING_JOB_NAME}
-
-#     # SageMaker の学習ジョブを実行するステップ
-#     estimator = create_estimator()
-#     data_path = {'train': args.data_path}
-
-#     training_step = steps.TrainingStep(
-#         'Train Step', 
-#         estimator=estimator,
-#         data=data_path,
-#         job_name=execution_input['TrainJobName'],  
-#         wait_for_completion=True
-#     )
-
-#     # 各 Step を連結
-#     chain_list = [training_step]
-#     workflow_definition = steps.Chain(chain_list)
-
-#     # Workflow の作成
-#     workflow = Workflow(
-#         name=FLOW_NAME,
-#         definition=workflow_definition,
-#         role=WORKFLOW_ROLE,
-#         execution_input=execution_input
-#     )
-#     workflow.create()
-
-#     # Workflow の実行
-#     execution = workflow.execute(inputs=inputs)
