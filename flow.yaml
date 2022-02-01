@@ -2,7 +2,7 @@ config:
   region: 'us-east-1'
   job-name-prefix: 'mlops-demo'
   image-name-prefix: 'mlops-demo'
-  sfn-workflow-name: 'mlops-demo'
+  sfn-workflow-name: 'lijewang2-MLOps-train_sfn_train'
   sfn-role-arn: 'arn:aws:iam::222136011322:role/lijewang2-MLOps-train-sfn-wf-exec-role'
   sagemaker-role-arn: 'arn:aws:iam::222136011322:role/lijewang2-MLOps-train-sagemaker-exec-role'
   secretsmanager-arn: 'arn:aws:secretsmanager:us-east-1:222136011322:secret:trainlijewang2MLOpstraindat-ZYjosUtLZqtC-mH9hqi'
