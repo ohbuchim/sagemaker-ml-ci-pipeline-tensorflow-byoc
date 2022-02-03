@@ -34,7 +34,8 @@ def get_parameters():
         config = yaml.safe_load(file)
         params['region'] = config['config']['region']
         params['sagemaker-role-arn'] = config['config']['sagemaker-role-arn']
-        params['sfn-workflow-name'] = config['config']['sfn-workflow-name']
+        # params['sfn-workflow-name'] = config['config']['sfn-workflow-name']
+        params['sfn-workflow-name'] = os.environ['SFN_WORKFLOW_NAME']
         params['sfn-role-arn'] = config['config']['sfn-role-arn']
         params['job-name-prefix'] = config['config']['job-name-prefix']
         params['secretsmanager-arn'] = config['config']['secretsmanager-arn']
