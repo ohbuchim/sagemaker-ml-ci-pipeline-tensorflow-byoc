@@ -1,17 +1,21 @@
 # https://pytorch.org/tutorials/intermediate/torchvision_tutorial.html
 
-import os
+import argparse
+import json
+import mlflow
+from mlflow.tracking import MlflowClient
 import numpy as np
-import torch
+import os
 from PIL import Image
+import torch
 import torchvision
 from torchvision.models.detection.faster_rcnn import FastRCNNPredictor
 from torchvision.models.detection.mask_rcnn import MaskRCNNPredictor
 import transforms as T
+
 from engine import train_one_epoch, evaluate
 import utils
-import argparse
-import json
+
 
 print('torch', torch.__version__)
 print('torchvision', torchvision.__version__)
@@ -193,6 +197,10 @@ if __name__ == "__main__":
                         help='learning rate (default: 0.01)')
     parser.add_argument('--momentum', type=float, default=0.5, metavar='M',
                         help='SGD momentum (default: 0.5)')
+    parser.add_argument('--mlflow-server', type=str, default='', metavar='N',
+                    help='MLFlow seer')
+    parser.add_argument('--experiment-name', type=str, default='', metavar='N',
+                    help='MLFlow experiment name')
 
 
     # Container environment
@@ -202,4 +210,32 @@ if __name__ == "__main__":
     parser.add_argument('--data-dir', type=str, default=os.environ['SM_CHANNEL_TRAINING'])
     parser.add_argument('--num-gpus', type=int, default=os.environ['SM_NUM_GPUS'])
 
-    train(parser.parse_args())
+    args = parser.parse_args()
+
+    experiment_name = args.experiment_name
+    mlflow.set_tracking_uri(args.mlflow_server)
+    
+    mlflow.set_experiment(experiment_name)
+    
+    experiment_id = mlflow.get_experiment_by_name(experiment_name).experiment_id
+    tags = {"engineering": "ML Platform"}
+        
+    best_model, max_map = train(args)
+        
+    with mlflow.start_run(tags=tags) as run:
+        params = {
+            "batch-size": args.batch_size,
+            "test-batch-size": args.test_batch_size,
+            "epochs": args.epochs,
+            "lr": args.lr,
+            "momentum": args.momentum
+        }
+        mlflow.log_params(params)
+        mlflow.log_metric(key='max_map', value=max_map)
+        run_id = run.info.run_id
+        
+    metadata_dict = {'run_id': run_id}
+    metadata_path = os.path.join(args.model_dir, 'metadata.json')
+        
+    with open(metadata_path, "w") as f:
+        f.write(json.dumps(metadata_dict))

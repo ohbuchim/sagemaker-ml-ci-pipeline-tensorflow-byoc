@@ -1,10 +1,12 @@
 # https://pytorch.org/tutorials/intermediate/torchvision_tutorial.html
 
 import argparse
-from PIL import Image
 import json
+import mlflow
+from mlflow.tracking import MlflowClient
 import numpy as np
 import os
+from PIL import Image
 import tarfile
 import torch
 import torchvision
@@ -159,11 +161,7 @@ def evaluate_model(args):
     
     report_dict = {"average_precision": coco_evaluator.coco_eval['bbox'].stats[0]}
     
-    evaluation_output_path = os.path.join(args.output_dir, "evaluation.json")
-    print("Saving classification report to {}".format(evaluation_output_path))
-
-    with open(evaluation_output_path, "w") as f:
-        f.write(json.dumps(report_dict))
+    return report_dict
 
 def save_model(model, model_dir):
     print("Saving the model.")
@@ -183,5 +181,36 @@ if __name__ == "__main__":
                     help='data file path')
     parser.add_argument('--output-dir', type=str, default='', metavar='N',
                     help='output file path')
+    parser.add_argument('--mlflow-server', type=str, default='', metavar='N',
+                    help='MLFlow seer')
+    parser.add_argument('--experiment-name', type=str, default='', metavar='N',
+                    help='MLFlow experiment name')
 
-    evaluate_model(parser.parse_args())
+    args = parser.parse_args()
+    
+    experiment_name = args.experiment_name
+    mlflow.set_tracking_uri(args.mlflow_server)
+    mlflow.set_experiment(experiment_name)
+    
+    experiment_id = mlflow.get_experiment_by_name(experiment_name).experiment_id
+    
+    report = evaluate_model(args)
+    
+    # get run_id
+    with open(os.path.join(args.model_dir, 'metadata.json'), 'r') as f:
+        json_load = json.load(f)
+        
+    run_id = json_load['run_id']
+    report["experiment_name"] = experiment_name
+    report["experiment_id"] = experiment_id
+    report["run_id"] = run_id
+    
+    client = MlflowClient()
+    client.log_metric(run_id, 'average_precision', report['average_precision'])
+    # client.log_artifact(run_id, args.output_dir)
+    
+    evaluation_output_path = os.path.join(args.output_dir, "evaluation.json")
+    print("Saving classification report to {}".format(evaluation_output_path))
+
+    with open(evaluation_output_path, "w") as f:
+        f.write(json.dumps(report))
